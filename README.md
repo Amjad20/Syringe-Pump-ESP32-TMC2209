@@ -4,6 +4,9 @@
 
 Firmware + hardware control for a syringe pump using **ESP32** + **TMC2209** stepper driver.
 
+![Syringe Pump Prototype](pics/syringe_pump.jpg)
+![Hardware Connections](pics/hardware_diagram.png)
+
 ## Overview
 
 This project implements the firmware and control interface for a syringe pump using an ESP32 microcontroller and a TMC2209 stepper driver. The aim is to precisely control a stepper motor to push/pull a syringe with configurable flow rates and volumes.
@@ -41,6 +44,8 @@ Typical use cases include microfluidics, lab automation, and medical prototyping
 - (Optional) limit switches, sensors
 
 ### Wiring Example
+
+![Wiring Diagram](pics/wiring_diagram.png)
 
 | Signal            | ESP32 Pin | TMC2209 Pin | Notes |
 |-------------------|-----------|--------------|-------|
@@ -97,6 +102,11 @@ STATUS            # Read pump status
 | Skipping steps | Too high speed | Lower speed or acceleration |
 | Overheating | Too high current | Lower driver current |
 | Inaccurate volume | Calibration error | Recalibrate steps per µL |
+
+## Authors
+
+Created by **Amjad20** & **Mohammed Alkaylani**  
+© 2025 — Open Hardware Project
 
 ## License
 
