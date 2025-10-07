@@ -18,22 +18,10 @@ Typical use cases include microfluidics, lab automation, and medical prototyping
 
 - Control of stepper-driven syringe pump via ESP32  
 - Uses TMC2209 stepper driver (UART / step/direction interface)  
-- Configurable parameters (flow rate, steps per µL, acceleration, limits)  
-- Serial or web-based interface for commands  
+- Configurable parameters (flow rate, steps per µL, acceleration, limits)
 - Safety checks (limits, error detection)  
 - Modular firmware design
 
-## Repository Structure
-
-```
-/
-├── ESP32/            ← ESP32 firmware source code  
-├── Qt/               ← (Optional) desktop GUI or control app  
-├── pics/             ← Images, diagrams, hardware photos  
-├── README.md         ← Project README (this file)  
-├── LICENSE           ← MIT license file  
-└── … other files …
-```
 
 ## Hardware Requirements
 
