@@ -34,7 +34,7 @@ Typical use cases include microfluidics, lab automation, and medical prototyping
 
 ### Wiring Example
 
-![Wiring Diagram](pics/wiring_diagram.png)
+![Wiring Diagram](pics/hardware_diagram.jpg)
 
 | Signal            | ESP32 Pin | TMC2209 Pin | Notes |
 |-------------------|-----------|--------------|-------|
