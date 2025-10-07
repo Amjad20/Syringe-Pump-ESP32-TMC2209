@@ -5,7 +5,8 @@
 Firmware + hardware control for a syringe pump using **ESP32** + **TMC2209** stepper driver.
 
 ![Syringe Pump Prototype](pics/syringe_pump.jpg)
-![Hardware Connections](pics/hardware_diagram.png)
+![Hardware Connections](pics/hardware_diagram.jpg)
+![GUI Controler](pics/controler.jpg)
 
 ## Overview
 
