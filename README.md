@@ -48,7 +48,7 @@ Typical use cases include microfluidics, lab automation, and medical prototyping
 
 ### Prerequisites
 
-- Arduino IDE / PlatformIO / ESP-IDF  
+- Arduino IDE / PlatformIO
 - ESP32 board package  
 - Required libraries (TMCStepper, AccelStepper, etc.)
 
@@ -93,7 +93,7 @@ STATUS            # Read pump status
 
 ## Authors
 
-Created by **Amjad20** & **Mohammed Alkaylani**  
+Created by **Amjad Alturkmani** & **Mohammed Alkaylani**  
 © 2025 — Open Hardware Project
 
 ## License
