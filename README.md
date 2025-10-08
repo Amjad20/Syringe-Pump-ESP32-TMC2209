@@ -17,18 +17,17 @@ Typical use cases include microfluidics, lab automation, and medical prototyping
 
 - Control of stepper-driven syringe pump via ESP32  
 - Uses TMC2209 stepper driver (UART / step/direction interface)  
-- Configurable parameters (flow rate, steps per µL, acceleration, limits)
-- Safety checks (limits, error detection)  
+- Configurable parameters (flow rate, steps per µL, acceleration, limits)  
 - Modular firmware design
 
 
 ## Hardware Requirements
 
 - ESP32 development board  
-- TMC2209 stepper driver  
-- Stepper motor (adequate torque & resolution)  
-- Syringe + mechanical coupling  
-- Power supply  
+- TMC2209 stepper driver (Used TMC2209-EVAL in our experiment)  
+- Stepper motor (Used NEMA17 200 steps/rev)  
+- Support Syringe Sizes 1, 3, 5, 10, 20, 30 and 60 ml
+- Power supply
 - (Optional) limit switches, sensors
 
 ### Wiring Example
@@ -37,10 +36,11 @@ Typical use cases include microfluidics, lab automation, and medical prototyping
 
 | Signal            | ESP32 Pin | TMC2209 Pin | Notes |
 |-------------------|-----------|--------------|-------|
-| UART TX / RX      | GPIO X    | RX / TX      | UART communication |
-| Step              | GPIO Y    | STEP         | Step pulses |
-| Direction         | GPIO Z    | DIR          | Direction control |
-| Enable / Sleep    | GPIO W    | EN / SLP     | Enable pin |
+| UART TX           |    TX2    | RX           | UART communication |
+| UART RX           |    RX2    | TX           | UART communication |
+| Step              | GPIO 14   | STEP         | Step pulses |
+| Direction         | GND/VCC   | DIR          | Check on the direction, no need to reverse it |
+| Enable            | GPIO 5    | EN           | Enable pin |
 | Motor coils       | —         | A+/A−, B+/B− | Motor connections |
 | Power supply      | —         | Vmotor, GND  | Motor power |
 
