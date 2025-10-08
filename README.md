@@ -60,20 +60,16 @@ cd Syringe-Pump-ESP32-TMC2209/ESP32
 # Open and compile using Arduino IDE or PlatformIO
 ```
 
-## Example Commands
+## Example
+Install Qt6, run the qt application,
+connect the ESP and COM port associated to it,
+Adjust the parameters in the application,
 
-```bash
-SET_RATE 100      # Set flow rate (µL/min)
-INFUSE 500        # Dispense 500 µL
-WITHDRAW 200      # Withdraw 200 µL
-STOP              # Stop pump
-STATUS            # Read pump status
-```
 
 ## Calibration
 
 1. Measure the volume moved per number of steps  
-2. Adjust `steps_per_ul` in firmware  
+2. Adjust `THREADED_ROD_PITCH` in firmware  
 3. Test accuracy at different speeds and volumes
 
 ## Safety
