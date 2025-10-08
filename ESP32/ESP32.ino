@@ -9,6 +9,7 @@
 #define DRIVER_ADDRESS_2 0b00
 #define R_SENSE_2 0.15f
 #define STALL_VALUE_2 2
+#define BOLUS_PIN 0
 
 const int PWM_CHANNEL = 0;
 const int PWM_FREQ = 10000;
@@ -22,42 +23,47 @@ const double revolution = 200;
 const double THREADED_ROD_PITCH = 1;
 bool stopFlag = false;
 
-double syring_length;
-double syring_size;
-double mLBolus;
+double syring_length = 70;
+double syring_size = 20;
+double mLBolus = 1;
 double steps;
-double minutes;
-double seconds;
+double minutes = 0;
+double seconds = 30;
 unsigned long delayPerStepInMicroseconds;
 
 hw_timer_t* timer1 = NULL;
 TMC2209Stepper driver2(&SERIAL_PORT_2, R_SENSE_2, DRIVER_ADDRESS_2);
 AccelStepper stepper1(1, 14, 23);
 
-void setup() {
-  Serial.begin(115200);
-  SERIAL_PORT_2.begin(115200);
-  pinMode(STEP_PIN_2, OUTPUT);
-  pinMode(EN_PIN_2, OUTPUT);
-  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
-  ledcAttachPin(uC_PWM, PWM_CHANNEL);
-  Serial.println("ESP32 Ready to receive data");
+void runBolus() {
+  double ustepsPerML = (ustep * revolution * syring_length) / (syring_size * THREADED_ROD_PITCH);
+  steps = mLBolus * ustepsPerML * 5; // scaling factor?
+  unsigned long totalTimeInMicroseconds = (minutes * 60 + seconds) * 1000000;
+  delayPerStepInMicroseconds = totalTimeInMicroseconds / steps;
+
+  Serial.println("Bolus Started!");
+  digitalWrite(EN_PIN_2, LOW);
+
+  for (long i = 0; i < steps; i++) {
+    if (stopFlag) {
+      Serial.println("Bolus stopped by flag");
+      break;
+    }
+    digitalWrite(STEP_PIN_2, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(STEP_PIN_2, LOW);
+    delayMicroseconds(delayPerStepInMicroseconds);
+  }
+
+  digitalWrite(EN_PIN_2, HIGH);
+  Serial.println("Bolus Complete!");
 }
 
-void loop() {
-  if (Serial.available()) {
-    String command = Serial.readStringUntil('\n');
-    command.trim();
+void stopMotor() {
+  digitalWrite(EN_PIN_2, HIGH);
+  ledcWrite(PWM_CHANNEL, 0);
 
-    if (command == "STOP") {
-      stopFlag = true;
-      Serial.println("Infusion Stopped!");
-    } else {
-      parseSerialData(command);
-      stopFlag = false;
-      runBolus();
-    }
-  }
+  Serial.println("Motor Stopped.");
 }
 
 void parseSerialData(String data) {
@@ -74,31 +80,34 @@ void parseSerialData(String data) {
   Serial.print(minutes);
   Serial.print(":");
   Serial.println(seconds);
-  if (syring_size == 60){
+  if (syring_size == 60) {
     syring_length = 90;
-  }else if(syring_size == 30){
+  } else if (syring_size == 30) {
     syring_length = 80;
-  }else if(syring_size == 20){
+  } else if (syring_size == 20) {
     syring_length = 70;
-  }else if(syring_size == 10){
+  } else if (syring_size == 10) {
     syring_length = 57;
-  }else if(syring_size == 5){
+  } else if (syring_size == 5) {
     syring_length = 42;
-  }else if(syring_size == 3){
+  } else if (syring_size == 3) {
     syring_length = 46;
-  }else if(syring_size == 1){
+  } else if (syring_size == 1) {
     syring_length = 57;
   }
-
-  double ustepsPerML = (ustep * revolution * syring_length) / (syring_size * THREADED_ROD_PITCH);
-  steps = mLBolus * ustepsPerML * 5;
-  unsigned long totalTimeInMicroseconds = (minutes * 60 + seconds) * 1000000;
-  delayPerStepInMicroseconds = totalTimeInMicroseconds / steps;
 }
 
-void runBolus() {
-  if (stopFlag) return digitalWrite(EN_PIN_2, HIGH);
 
+void setup() {
+  Serial.begin(115200);
+  SERIAL_PORT_2.begin(115200);
+  pinMode(STEP_PIN_2, OUTPUT);
+  pinMode(EN_PIN_2, OUTPUT);
+  pinMode(BOLUS_PIN, INPUT_PULLUP);
+  pinMode(2, OUTPUT);
+  ledcSetup(PWM_CHANNEL, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttachPin(uC_PWM, PWM_CHANNEL);
+  Serial.println("ESP32 Ready to receive data");
   digitalWrite(EN_PIN_2, LOW);
   driver2.begin();
   driver2.toff(4);
@@ -113,22 +122,33 @@ void runBolus() {
   driver2.sedn(0b01);
   driver2.SGTHRS(STALL_VALUE_2);
   ledcWrite(PWM_CHANNEL, 128);
+}
 
+void loop() {
 
-  Serial.println("Bolus Started!");
+  if (Serial.available()) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
 
-  for (long i = 0; i < steps; i++) {
-    if (stopFlag) {
-      Serial.println("Bolus Stopped!");
-      break;
+    if (command == "STOP") {
+      stopFlag = true;
+      Serial.println("Infusion Stopped!");
+    } else {
+      parseSerialData(command);
+      stopFlag = false;
+      runBolus();
     }
-
-    digitalWrite(STEP_PIN_2, HIGH);
-    delayMicroseconds(delayPerStepInMicroseconds / 2);
-    digitalWrite(STEP_PIN_2, LOW);
-    delayMicroseconds(delayPerStepInMicroseconds / 2);
   }
 
-  Serial.println("Bolus is ended");
-  digitalWrite(EN_PIN_2, HIGH);
+  if (digitalRead(BOLUS_PIN) == LOW) {
+    digitalWrite(EN_PIN_2, LOW);
+    digitalWrite(STEP_PIN_2, HIGH);
+    delayMicroseconds(1);
+    digitalWrite(STEP_PIN_2, LOW);
+    delayMicroseconds(1);
+    digitalWrite(2, HIGH);
+  } else {
+    digitalWrite(EN_PIN_2, HIGH);
+    digitalWrite(2, LOW);
+  }
 }
